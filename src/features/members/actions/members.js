@@ -3,11 +3,11 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { ApiError } from "@/lib/api/errors";
-import { apiPost, apiPatch } from "@/lib/api/client";
+import { apiGet, apiPost, apiPatch } from "@/lib/api/client";
 import {
   memberCreateSchema,
   memberUpdateSchema,
-} from "@/features/auth/validations/schemas";
+} from "@/features/members/validations/schemas";
 import { ROUTES } from "@/constants/routes";
 import { MESSAGES } from "@/constants/messages";
 import {
@@ -16,12 +16,34 @@ import {
   isNextNavigationError,
 } from "@/lib/server-actions";
 
+export async function lookupUserByEmailAction(email) {
+  try {
+    const { data } = await apiGet("/members/lookup-user/", { email });
+    return { success: true, data };
+  } catch (error) {
+    const { message, fieldErrors } = formatApiErrors(error, ApiError);
+    return { success: false, message, fieldErrors };
+  }
+}
+
 export async function createMemberAction(prevState, formData) {
+  const userId = formData.get("user");
   const raw = {
-    user: formData.get("user"),
     role: formData.get("role"),
     is_active: formData.get("is_active") === "on",
   };
+
+  if (userId) {
+    raw.user = userId;
+  } else {
+    raw.new_user = {
+      email: formData.get("new_user_email"),
+      username: formData.get("new_user_username"),
+      password: formData.get("new_user_password"),
+      first_name: formData.get("new_user_first_name") || "",
+      last_name: formData.get("new_user_last_name") || "",
+    };
+  }
 
   const parsed = memberCreateSchema.safeParse(raw);
   if (!parsed.success) {

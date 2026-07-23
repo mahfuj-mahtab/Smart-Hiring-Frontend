@@ -11,7 +11,6 @@ import {
   GripVertical,
   Mail,
   Phone,
-  Users,
   Star,
   Eye,
 } from "lucide-react";
@@ -28,6 +27,7 @@ import {
 import { MESSAGES } from "@/constants/messages";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/format-date";
+import { toProxiedMediaUrl } from "@/lib/media-url";
 import { PermissionGate } from "@/components/layout/PermissionGate";
 import { PERMISSIONS } from "@/constants/permissions";
 
@@ -56,58 +56,22 @@ function getInitials(name, email) {
     .join("");
 }
 
-function PipelineStats({ columns }) {
-  const total = APPLICATION_STAGES.reduce(
-    (sum, stage) => sum + (columns[stage]?.length || 0),
-    0
-  );
+function getDragStyle(style, snapshot) {
+  if (!style) return undefined;
+  if (!snapshot.isDragging) return style;
 
-  return (
-    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Users className="h-5 w-5" />
-        </div>
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">Pipeline</p>
-          <p className="text-2xl font-bold tracking-tight">{total} candidates</p>
-        </div>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {APPLICATION_STAGES.map((stage) => {
-          const theme = STAGE_THEME[stage];
-          const count = columns[stage]?.length || 0;
-          return (
-            <div
-              key={stage}
-              className={cn(
-                "inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium",
-                theme.count
-              )}
-            >
-              <span className={cn("h-1.5 w-1.5 rounded-full", theme.dot)} />
-              {STAGE_LABELS[stage]}
-              <span className="font-bold">{count}</span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+  return {
+    ...style,
+    margin: 0,
+  };
 }
 
-function KanbanCard({ app, isDragging, reviewHref }) {
+function KanbanCard({ app, reviewHref }) {
   const name = app.candidate_name || app.candidate_email;
   const theme = STAGE_THEME[app.stage] || STAGE_THEME.applied;
 
   return (
-    <div
-      className={cn(
-        "kanban-card group border-l-[3px]",
-        theme.accent,
-        isDragging && "kanban-card-dragging"
-      )}
-    >
+    <div className={cn("kanban-card group border-l-[3px]", theme.accent)}>
       <div className="flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
           {getInitials(app.candidate_name, app.candidate_email)}
@@ -174,7 +138,7 @@ function KanbanCard({ app, isDragging, reviewHref }) {
               className="h-7 rounded-md px-2 text-xs"
               asChild
             >
-              <a href={app.cv_url} target="_blank" rel="noopener noreferrer">
+              <a href={toProxiedMediaUrl(app.cv_url)} target="_blank" rel="noopener noreferrer">
                 <FileText className="h-3.5 w-3.5" />
                 CV
               </a>
@@ -191,7 +155,7 @@ function KanbanColumn({ stage, items, disabled, listQuery }) {
   const Icon = STAGE_ICONS[stage];
 
   return (
-    <div className="kanban-column flex w-[min(100%,20rem)] shrink-0 flex-col">
+    <div className="kanban-column">
       <div className="kanban-column-header">
         <div className="flex items-center gap-2.5">
           <span className={cn("h-2.5 w-2.5 rounded-full ring-4", theme.dot, theme.ring)} />
@@ -211,9 +175,10 @@ function KanbanColumn({ stage, items, disabled, listQuery }) {
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={cn(
-              "kanban-column-body flex-1",
+              "kanban-column-body",
               theme.column,
-              (snapshot.isDraggingOver) && theme.columnActive
+              snapshot.isDraggingOver && theme.columnActive,
+              snapshot.isDraggingOver && "kanban-column-body--active"
             )}
           >
             {items.map((app, index) => (
@@ -228,12 +193,17 @@ function KanbanColumn({ stage, items, disabled, listQuery }) {
                     ref={dragProvided.innerRef}
                     {...dragProvided.draggableProps}
                     {...dragProvided.dragHandleProps}
-                    style={dragProvided.draggableProps.style}
-                    className="mb-0"
+                    style={getDragStyle(
+                      dragProvided.draggableProps.style,
+                      dragSnapshot
+                    )}
+                    className={cn(
+                      "kanban-card-wrapper",
+                      dragSnapshot.isDragging && "kanban-card-wrapper--dragging"
+                    )}
                   >
                     <KanbanCard
                       app={app}
-                      isDragging={dragSnapshot.isDragging}
                       reviewHref={applicationReviewUrl(app.id, listQuery)}
                     />
                   </div>
@@ -323,7 +293,7 @@ export function ApplicationsKanban({ applications }) {
           toast.success(MESSAGES.applications.stageUpdated);
           router.refresh();
         } else {
-          toast.error(result.message);
+          toast.error(result.message || MESSAGES.common.error);
           setColumns(groupByStage(applications));
         }
       });
@@ -331,8 +301,7 @@ export function ApplicationsKanban({ applications }) {
   };
 
   return (
-    <div className={cn(pending && "opacity-70 pointer-events-none transition-opacity")}>
-      <PipelineStats columns={columns} />
+    <div className={cn(pending && "pointer-events-none opacity-70 transition-opacity")}>
       <PermissionGate
         permission={PERMISSIONS.CANDIDATE_CHANGE}
         fallback={

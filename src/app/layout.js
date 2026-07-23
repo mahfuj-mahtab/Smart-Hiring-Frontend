@@ -35,7 +35,7 @@ export default async function RootLayout({ children }) {
           <ThemeProvider>
             <AuthHydrator session={session} />
             {children}
-            <Toaster position="top-right" richColors />
+            <Toaster position="top-right" richColors closeButton duration={4000} />
           </ThemeProvider>
         </StoreProvider>
       </body>

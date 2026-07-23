@@ -12,7 +12,7 @@ export default async function NewMemberPage() {
 
   return (
     <>
-      <PageHeader title="Add member" description="Add a team member to your organization" />
+      <PageHeader title="Add member" description="Search by email to add or create a team member" />
       <MemberForm action={createMemberAction} roles={roles} />
     </>
   );

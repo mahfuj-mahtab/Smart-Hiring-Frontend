@@ -1,8 +1,7 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 import Link from "next/link";
-import { toast } from "sonner";
 import {
   MapPin,
   Briefcase,
@@ -18,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ApiErrorBanner } from "@/components/forms/FormField";
 import { applyToJobAction } from "@/features/careers/actions/apply";
+import { useActionToast } from "@/lib/hooks/use-action-toast";
+import { MESSAGES } from "@/constants/messages";
 import {
   EMPLOYMENT_TYPE_LABELS,
   EXPERIENCE_LEVEL_LABELS,
@@ -39,16 +40,12 @@ function JobSection({ title, content }) {
   );
 }
 
-export function JobDetail({ job, isCandidate }) {
+export function JobDetail({ job, isAuthenticated, accountType }) {
   const [state, formAction, pending] = useActionState(applyToJobAction, null);
   const salary = formatSalary(job.salary_min, job.salary_max, job.salary_currency);
   const loginUrl = `${ROUTES.LOGIN}?next=${encodeURIComponent(`${ROUTES.CAREERS}/${job.id}`)}`;
 
-  useEffect(() => {
-    if (state?.success) {
-      toast.success(state.message);
-    }
-  }, [state]);
+  useActionToast(state, { successMessage: MESSAGES.applications.applied });
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 page-enter">
@@ -124,10 +121,10 @@ export function JobDetail({ job, isCandidate }) {
               Application submitted! We&apos;ll be in touch if you&apos;re a match.
             </p>
           </div>
-        ) : !isCandidate ? (
+        ) : !isAuthenticated ? (
           <div className="mt-6 space-y-4 rounded-xl border border-dashed border-border/80 bg-muted/20 p-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Sign in with your candidate account to apply.
+              Sign in to apply for this position.
             </p>
             <Button asChild variant="gradient" className="rounded-xl">
               <Link href={loginUrl}>Sign in to apply</Link>
@@ -144,6 +141,11 @@ export function JobDetail({ job, isCandidate }) {
           </div>
         ) : (
           <form action={formAction} className="mt-6 space-y-5">
+            {accountType === "employer" && (
+              <p className="rounded-lg border border-border/60 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
+                Applying with your work account. Your application is sent to this company only.
+              </p>
+            )}
             <input type="hidden" name="job_id" value={job.id} />
             <ApiErrorBanner message={state?.message} fieldErrors={state?.fieldErrors} />
 

@@ -47,4 +47,7 @@ export const MESSAGES = {
     stageUpdated: "Application stage updated",
     applied: "Application submitted successfully",
   },
+  organization: {
+    updated: "Organization settings saved successfully",
+  },
 };

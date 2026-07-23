@@ -9,10 +9,16 @@ import { FormField, ApiErrorBanner } from "@/components/forms/FormField";
 import { FormSection } from "@/components/forms/FormSection";
 import { roleSchema } from "@/features/auth/validations/schemas";
 import { PermissionMatrix } from "./PermissionMatrix";
+import { useActionToast } from "@/lib/hooks/use-action-toast";
+import { MESSAGES } from "@/constants/messages";
 
 export function RoleForm({ action, role, permissions, readOnly = false }) {
   const [state, formAction, pending] = useActionState(action, null);
   const selectedIds = role?.permissions?.map((p) => p.id) || [];
+
+  useActionToast(state, {
+    successMessage: role ? MESSAGES.roles.updated : MESSAGES.roles.created,
+  });
 
   const {
     register,

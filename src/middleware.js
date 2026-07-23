@@ -8,7 +8,7 @@ const PUBLIC_PATHS = [
   "/careers",
 ];
 
-const EMPLOYER_PATHS = ["/dashboard", "/roles", "/members", "/jobs", "/applications"];
+const EMPLOYER_PATHS = ["/dashboard", "/roles", "/members", "/jobs", "/applications", "/organization"];
 const CANDIDATE_PATHS = ["/candidate"];
 
 const RESERVED_SUBDOMAINS = ["www", "api", "admin"];

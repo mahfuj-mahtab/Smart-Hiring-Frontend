@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTransition } from "react";
-import { FileText, ExternalLink, Filter, Star, Eye } from "lucide-react";
+import { FileText, ExternalLink, Filter, Star, Eye, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { DataTable } from "@/components/tables/DataTable";
@@ -13,6 +13,7 @@ import {
   STAGE_LABELS,
 } from "@/features/applications/constants/stages";
 import { formatDate } from "@/lib/format-date";
+import { toProxiedMediaUrl } from "@/lib/media-url";
 import { applicationReviewUrl } from "@/features/applications/utils/review-query";
 
 export function ApplicationsTable({ applications, pagination, jobs = [] }) {
@@ -91,7 +92,7 @@ export function ApplicationsTable({ applications, pagination, jobs = [] }) {
       render: (row) =>
         row.cv_url ? (
           <Button variant="outline" size="sm" asChild className="h-8 rounded-lg px-2.5">
-            <a href={row.cv_url} target="_blank" rel="noopener noreferrer">
+            <a href={toProxiedMediaUrl(row.cv_url)} target="_blank" rel="noopener noreferrer">
               <FileText className="h-3.5 w-3.5" />
               View
               <ExternalLink className="h-3 w-3 opacity-50" />
@@ -129,45 +130,57 @@ export function ApplicationsTable({ applications, pagination, jobs = [] }) {
   return (
     <div className="space-y-4">
       <div className="filter-toolbar">
-        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <Filter className="h-4 w-4" />
-          Filters
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Filter className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Filters</p>
+            <p className="text-xs text-muted-foreground">Narrow down your pipeline</p>
+          </div>
         </div>
-        <NativeSelect
-          value={currentStage}
-          onChange={(e) => updateFilter("stage", e.target.value)}
-          disabled={pending}
-          wrapperClassName="w-full sm:w-48"
-        >
-          <option value="">All stages</option>
-          {APPLICATION_STAGES.map((stage) => (
-            <option key={stage} value={stage}>
-              {STAGE_LABELS[stage]}
-            </option>
-          ))}
-        </NativeSelect>
-        <NativeSelect
-          value={currentJob}
-          onChange={(e) => updateFilter("job", e.target.value)}
-          disabled={pending}
-          wrapperClassName="w-full sm:w-56"
-        >
-          <option value="">All jobs</option>
-          {jobs.map((job) => (
-            <option key={job.id} value={job.id}>
-              {job.title}
-            </option>
-          ))}
-        </NativeSelect>
+        <div className="flex w-full flex-col gap-3 sm:ml-auto sm:w-auto sm:flex-row sm:items-center">
+          <div className="flex items-center gap-2">
+            <Briefcase className="h-4 w-4 text-muted-foreground sm:hidden" />
+            <NativeSelect
+              value={currentStage}
+              onChange={(e) => updateFilter("stage", e.target.value)}
+              disabled={pending}
+              wrapperClassName="w-full sm:w-44"
+            >
+              <option value="">All stages</option>
+              {APPLICATION_STAGES.map((stage) => (
+                <option key={stage} value={stage}>
+                  {STAGE_LABELS[stage]}
+                </option>
+              ))}
+            </NativeSelect>
+          </div>
+          <NativeSelect
+            value={currentJob}
+            onChange={(e) => updateFilter("job", e.target.value)}
+            disabled={pending}
+            wrapperClassName="w-full sm:w-56"
+          >
+            <option value="">All jobs</option>
+            {jobs.map((job) => (
+              <option key={job.id} value={job.id}>
+                {job.title}
+              </option>
+            ))}
+          </NativeSelect>
+        </div>
       </div>
-      <DataTable
+      <div className="premium-card border-0 p-1 sm:p-2">
+        <DataTable
         columns={columns}
         data={applications}
         pagination={pagination}
         searchPlaceholder="Search candidates or jobs..."
         emptyTitle="No applications yet"
         emptyDescription="Applications will appear here when candidates apply to your jobs"
-      />
+        />
+      </div>
     </div>
   );
 }

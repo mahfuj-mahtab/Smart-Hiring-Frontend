@@ -110,3 +110,31 @@ export async function apiPostForm(path, formData, options = {}) {
 
   return parseApiResponse(res);
 }
+
+export async function apiPatchForm(path, formData, options = {}) {
+  const { retryOnUnauthorized = true, ...fetchOptions } = options;
+
+  const makeRequest = async () => {
+    const authHeaders = await getAuthHeaders();
+    const headers = { ...authHeaders, ...fetchOptions.headers };
+
+    return fetch(`${API_URL}/api/v1${path}`, {
+      ...fetchOptions,
+      method: "PATCH",
+      headers,
+      body: formData,
+      cache: fetchOptions.cache ?? "no-store",
+    });
+  };
+
+  let res = await makeRequest();
+
+  if (res.status === 401 && retryOnUnauthorized && !path.startsWith("/auth/")) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      res = await makeRequest();
+    }
+  }
+
+  return parseApiResponse(res);
+}

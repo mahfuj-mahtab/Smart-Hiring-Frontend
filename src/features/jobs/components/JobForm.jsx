@@ -16,6 +16,8 @@ import {
   WORK_MODE_LABELS,
   WORK_MODES,
 } from "@/features/jobs/constants/job";
+import { useActionToast } from "@/lib/hooks/use-action-toast";
+import { MESSAGES } from "@/constants/messages";
 
 function Section({ title, description, children }) {
   return (
@@ -33,6 +35,10 @@ const textareaClass =
 
 export function JobForm({ action, job, isEdit = false }) {
   const [state, formAction, pending] = useActionState(action, null);
+
+  useActionToast(state, {
+    successMessage: isEdit ? MESSAGES.jobs.updated : MESSAGES.jobs.created,
+  });
 
   return (
     <form action={formAction} className="space-y-6 max-w-3xl">

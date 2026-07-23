@@ -15,4 +15,6 @@ export const PERMISSIONS = {
   ROLE_ADD: "role.add",
   ROLE_CHANGE: "role.change",
   ROLE_DELETE: "role.delete",
+  ORGANIZATION_VIEW: "organization.view",
+  ORGANIZATION_CHANGE: "organization.change",
 };

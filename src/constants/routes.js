@@ -11,6 +11,7 @@ export const ROUTES = {
   CANDIDATE_PROFILE: "/candidate/profile",
   JOBS: "/jobs",
   APPLICATIONS: "/applications",
+  ORGANIZATION_SETTINGS: "/organization/settings",
   applicationDetail: (id) => `/applications/${id}`,
   CAREERS: "/careers",
 };

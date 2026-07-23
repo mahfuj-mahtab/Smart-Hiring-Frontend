@@ -10,9 +10,13 @@ import { FormField, ApiErrorBanner } from "@/components/forms/FormField";
 import { registerEmployerAction } from "@/features/auth/actions/auth";
 import { registerEmployerSchema } from "@/features/auth/validations/schemas";
 import { ROUTES } from "@/constants/routes";
+import { useActionToast } from "@/lib/hooks/use-action-toast";
+import { MESSAGES } from "@/constants/messages";
 
 export function RegisterEmployerForm() {
   const [state, formAction, pending] = useActionState(registerEmployerAction, null);
+
+  useActionToast(state, { successMessage: MESSAGES.auth.registerSuccess });
   const {
     register,
     formState: { errors },

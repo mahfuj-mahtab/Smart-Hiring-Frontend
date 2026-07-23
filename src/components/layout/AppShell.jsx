@@ -13,6 +13,7 @@ import {
   X,
   Moon,
   Sun,
+  Building2,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,12 @@ const navItems = [
     href: ROUTES.APPLICATIONS,
     icon: ClipboardList,
     permission: PERMISSIONS.CANDIDATE_VIEW,
+  },
+  {
+    label: "Organization",
+    href: ROUTES.ORGANIZATION_SETTINGS,
+    icon: Building2,
+    permission: PERMISSIONS.ORGANIZATION_CHANGE,
   },
 ];
 

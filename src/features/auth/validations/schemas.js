@@ -31,14 +31,3 @@ export const roleSchema = z.object({
   name: z.string().min(2, "Role name is required"),
   permission_ids: z.array(z.string()).optional(),
 });
-
-export const memberCreateSchema = z.object({
-  user: z.string().uuid("Valid user ID is required"),
-  role: z.string().uuid("Role is required"),
-  is_active: z.boolean().optional().default(true),
-});
-
-export const memberUpdateSchema = z.object({
-  role: z.string().uuid("Role is required"),
-  is_active: z.boolean(),
-});
