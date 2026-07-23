@@ -1,0 +1,18 @@
+export const PERMISSIONS = {
+  JOB_VIEW: "job.view",
+  JOB_ADD: "job.add",
+  JOB_CHANGE: "job.change",
+  JOB_DELETE: "job.delete",
+  CANDIDATE_VIEW: "candidate.view",
+  CANDIDATE_ADD: "candidate.add",
+  CANDIDATE_CHANGE: "candidate.change",
+  CANDIDATE_DELETE: "candidate.delete",
+  EMPLOYEE_VIEW: "employee.view",
+  EMPLOYEE_ADD: "employee.add",
+  EMPLOYEE_CHANGE: "employee.change",
+  EMPLOYEE_DELETE: "employee.delete",
+  ROLE_VIEW: "role.view",
+  ROLE_ADD: "role.add",
+  ROLE_CHANGE: "role.change",
+  ROLE_DELETE: "role.delete",
+};

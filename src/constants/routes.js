@@ -1,0 +1,16 @@
+export const ROUTES = {
+  HOME: "/",
+  LOGIN: "/login",
+  REGISTER: "/register",
+  REGISTER_CANDIDATE: "/register/candidate",
+  DASHBOARD: "/dashboard",
+  ROLES: "/roles",
+  ROLES_NEW: "/roles/new",
+  MEMBERS: "/members",
+  MEMBERS_NEW: "/members/new",
+  CANDIDATE_PROFILE: "/candidate/profile",
+  JOBS: "/jobs",
+  APPLICATIONS: "/applications",
+  applicationDetail: (id) => `/applications/${id}`,
+  CAREERS: "/careers",
+};
